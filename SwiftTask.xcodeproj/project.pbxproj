@@ -18,7 +18,6 @@
 		1F4C7AD71B7CD27200DEB1AE /* Async.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1F4C7AD61B7CD27100DEB1AE /* Async.framework */; };
 		1F4C7AD91B7CD27600DEB1AE /* Async.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1F4C7AD81B7CD27600DEB1AE /* Async.framework */; };
 		1F6A8CA319A4E4F200369A5D /* SwiftTaskTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F46DEE3199EDF1000F97868 /* SwiftTaskTests.swift */; };
-		1FB3B8F31B0A194F00F78900 /* _Atomic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FB3B8F21B0A194F00F78900 /* _Atomic.swift */; };
 		1FB3B8F71C5CF2CA00C1A479 /* SwiftTask.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1F46DED4199EDF1000F97868 /* SwiftTask.framework */; };
 		1FCF71121AD8CD2B007079C2 /* Alamofire.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1FCF71111AD8CD2B007079C2 /* Alamofire.framework */; };
 		1FCF71161AD8CD38007079C2 /* Alamofire.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1FCF71151AD8CD38007079C2 /* Alamofire.framework */; };
@@ -34,7 +33,6 @@
 		48511C5B19C17563002FE03C /* RetainCycleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48511C5A19C17563002FE03C /* RetainCycleTests.swift */; };
 		485C31F11A1D619A00040DA3 /* TypeInferenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 485C31F01A1D619A00040DA3 /* TypeInferenceTests.swift */; };
 		485C31F21A1D619A00040DA3 /* TypeInferenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 485C31F01A1D619A00040DA3 /* TypeInferenceTests.swift */; };
-		487858241B09701F0022E56A /* _RecursiveLock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 487858231B09701F0022E56A /* _RecursiveLock.swift */; };
 		48A1E8221A366F9C007619EB /* SwiftTask.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1F46DED4199EDF1000F97868 /* SwiftTask.framework */; };
 		48B58D7B1A6F255E0068E18C /* _StateMachine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48B58D7A1A6F255E0068E18C /* _StateMachine.swift */; };
 /* End PBXBuildFile section */
@@ -71,7 +69,6 @@
 		1F4C7AD61B7CD27100DEB1AE /* Async.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Async.framework; path = ../Carthage/Checkouts/Async/build/Debug/Async.framework; sourceTree = "<group>"; };
 		1F4C7AD81B7CD27600DEB1AE /* Async.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Async.framework; path = "../Carthage/Checkouts/Async/build/Debug-iphoneos/Async.framework"; sourceTree = "<group>"; };
 		1F5FA35619A374E600975FB9 /* AlamofireTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlamofireTests.swift; sourceTree = "<group>"; };
-		1FB3B8F21B0A194F00F78900 /* _Atomic.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = _Atomic.swift; sourceTree = "<group>"; };
 		1FCF71111AD8CD2B007079C2 /* Alamofire.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Alamofire.framework; path = "../Carthage/Checkouts/Alamofire/build/Debug-iphoneos/Alamofire.framework"; sourceTree = "<group>"; };
 		1FCF71151AD8CD38007079C2 /* Alamofire.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Alamofire.framework; path = ../Carthage/Checkouts/Alamofire/build/Debug/Alamofire.framework; sourceTree = "<group>"; };
 		1FD7197A1AFE387C00BC38C4 /* Cancellable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Cancellable.swift; sourceTree = "<group>"; };
@@ -86,7 +83,6 @@
 		4822F0D019D00ABF00F5F572 /* SwiftTask-iOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "SwiftTask-iOSTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		48511C5A19C17563002FE03C /* RetainCycleTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RetainCycleTests.swift; sourceTree = "<group>"; };
 		485C31F01A1D619A00040DA3 /* TypeInferenceTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TypeInferenceTests.swift; sourceTree = "<group>"; };
-		487858231B09701F0022E56A /* _RecursiveLock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = _RecursiveLock.swift; sourceTree = "<group>"; };
 		48B58D7A1A6F255E0068E18C /* _StateMachine.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = _StateMachine.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -156,8 +152,6 @@
 				1F46DEFA199EDF8100F97868 /* SwiftTask.swift */,
 				1FD7197A1AFE387C00BC38C4 /* Cancellable.swift */,
 				48B58D7A1A6F255E0068E18C /* _StateMachine.swift */,
-				487858231B09701F0022E56A /* _RecursiveLock.swift */,
-				1FB3B8F21B0A194F00F78900 /* _Atomic.swift */,
 				1F46DED7199EDF1000F97868 /* Supporting Files */,
 			);
 			path = SwiftTask;
@@ -375,8 +369,6 @@
 				1F46DEFB199EDF8100F97868 /* SwiftTask.swift in Sources */,
 				1FD7197B1AFE387C00BC38C4 /* Cancellable.swift in Sources */,
 				48B58D7B1A6F255E0068E18C /* _StateMachine.swift in Sources */,
-				1FB3B8F31B0A194F00F78900 /* _Atomic.swift in Sources */,
-				487858241B09701F0022E56A /* _RecursiveLock.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

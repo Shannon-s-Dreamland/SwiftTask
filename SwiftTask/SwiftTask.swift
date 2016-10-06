@@ -22,6 +22,51 @@ public enum TaskState: String, CustomStringConvertible
     {
         return self.rawValue
     }
+    
+    internal mutating func update(_ f: (TaskState) -> TaskState) -> TaskState
+    {
+        return self.updateIf { f($0) }!
+    }
+    
+    internal mutating func updateIf(_ f: (TaskState) -> TaskState?) -> TaskState?
+    {
+        return self.modify { value in f(value).map { ($0, value) } }
+    }
+
+    internal mutating func modify<U>(_ f: (TaskState) -> (TaskState, U)?) -> U?
+    {
+        if let (newValue, retValue) = f(self) {
+            self = newValue
+            return retValue
+        }
+        else {
+            return nil
+        }
+    }
+}
+
+internal extension Bool
+{
+    internal mutating func update(_ f: (Bool) -> Bool) -> Bool
+    {
+        return self.updateIf { f($0) }!
+    }
+    
+    internal mutating func updateIf(_ f: (Bool) -> Bool?) -> Bool?
+    {
+        return self.modify { value in f(value).map { ($0, value) } }
+    }
+    
+    internal mutating func modify<U>(_ f: (Bool) -> (Bool, U)?) -> U?
+    {
+        if let (newValue, retValue) = f(self) {
+            self = newValue
+            return retValue
+        }
+        else {
+            return nil
+        }
+    }
 }
 
 // NOTE: use class instead of struct to pass reference to `_initClosure` to set `pause`/`resume`/`cancel` closures
@@ -34,10 +79,10 @@ public class TaskConfiguration
     /// useful to terminate immediate-infinite-sequence while performing `initClosure`
     public var isFinished : Bool
     {
-        return self._isFinished.rawValue
+        return self._isFinished
     }
     
-    private var _isFinished = _Atomic(false)
+    private var _isFinished = false
     
     internal func finish()
     {
@@ -53,7 +98,7 @@ public class TaskConfiguration
         self.pause = nil
         self.resume = nil
         self.cancel = nil
-        self._isFinished.rawValue = true
+        self._isFinished = true
     }
 }
 
@@ -84,16 +129,16 @@ open class Task<Progress, Value, Error>: Cancellable, CustomStringConvertible
     internal let _paused: Bool
     internal var _initClosure: _InitClosure!    // retained throughout task's lifetime
     
-    public var state: TaskState { return self._machine.state.rawValue }
+    public var state: TaskState { return self._machine.state }
     
     /// progress value (NOTE: always nil when `weakified = true`)
-    public var progress: Progress? { return self._machine.progress.rawValue }
+    public var progress: Progress? { return self._machine.progress }
     
     /// fulfilled value
-    public var value: Value? { return self._machine.value.rawValue }
+    public var value: Value? { return self._machine.value }
     
     /// rejected/cancelled tuple info
-    public var errorInfo: ErrorInfo? { return self._machine.errorInfo.rawValue }
+    public var errorInfo: ErrorInfo? { return self._machine.errorInfo }
     
     public var name: String = "DefaultTask"
     
@@ -110,7 +155,7 @@ open class Task<Progress, Value, Error>: Cancellable, CustomStringConvertible
                 valueString = "progress=\(self.progress)"
         }
         
-        return "<\(self.name); state=\(self.state.rawValue); \(valueString!))>"
+        return "<\(self.name); state=\(self.state); \(valueString!))>"
     }
     
     ///
@@ -220,7 +265,7 @@ open class Task<Progress, Value, Error>: Cancellable, CustomStringConvertible
         self._initClosure = _initClosure
         
         // will be invoked on 1st resume (only once)
-        self._machine.initResumeClosure.rawValue = { [weak self] in
+        self._machine.initResumeClosure = { [weak self] in
             
             // strongify `self` on 1st resume
             if let self_ = self {
@@ -431,7 +476,7 @@ open class Task<Progress, Value, Error>: Cancellable, CustomStringConvertible
             let selfMachine = self._machine
             
             self._then(&canceller) {
-                let innerTask = thenClosure(selfMachine.value.rawValue, selfMachine.errorInfo.rawValue)
+                let innerTask = thenClosure(selfMachine.value, selfMachine.errorInfo)
                 _bindInnerTask(innerTask, newMachine, progress, fulfill, _reject, configure)
             }
             
@@ -498,11 +543,11 @@ open class Task<Progress, Value, Error>: Cancellable, CustomStringConvertible
             
             // NOTE: using `self._then()` + `selfMachine` instead of `self.then()` will reduce Task allocation
             self._then(&localCanceller) {
-                if let value = selfMachine.value.rawValue {
+                if let value = selfMachine.value {
                     let innerTask = successClosure(value)
                     _bindInnerTask(innerTask, newMachine, progress, fulfill, _reject, configure)
                 }
-                else if let errorInfo = selfMachine.errorInfo.rawValue {
+                else if let errorInfo = selfMachine.errorInfo {
                     _reject(errorInfo)
                 }
             }
@@ -555,10 +600,10 @@ open class Task<Progress, Value, Error>: Cancellable, CustomStringConvertible
             let selfMachine = self._machine
             
             self._then(&localCanceller) {
-                if let value = selfMachine.value.rawValue {
+                if let value = selfMachine.value {
                     fulfill(value)
                 }
-                else if let errorInfo = selfMachine.errorInfo.rawValue {
+                else if let errorInfo = selfMachine.errorInfo {
                     let innerTask = failureClosure(errorInfo)
                     _bindInnerTask(innerTask, newMachine, progress, fulfill, _reject, configure)
                 }
@@ -584,10 +629,10 @@ open class Task<Progress, Value, Error>: Cancellable, CustomStringConvertible
         let selfMachine = self._machine
         
         self._then(&canceller) {
-            if let value = selfMachine.value.rawValue {
+            if let value = selfMachine.value {
                 success?(value)
             }
-            else if let errorInfo = selfMachine.errorInfo.rawValue {
+            else if let errorInfo = selfMachine.errorInfo {
                 failure?(errorInfo)
             }
         }
@@ -659,10 +704,10 @@ internal func _bindInnerTask<Progress2, Value2, Error, Error2>(
     configure.cancel = { innerTask.cancel(); return }
     
     // pause/cancel innerTask if descendant task is already paused/cancelled
-    if newMachine.state.rawValue == .Paused {
+    if newMachine.state == .Paused {
         innerTask.pause()
     }
-    else if newMachine.state.rawValue == .Cancelled {
+    else if newMachine.state == .Cancelled {
         innerTask.cancel()
     }
 }
@@ -683,13 +728,11 @@ extension Task
             
             var completedCount = 0
             let totalCount = tasks.count
-            let lock = _RecursiveLock()
-            let cancelled = _Atomic(false)
+            var cancelled = false
             
             for task in tasks {
                 task.success { (value: Value) -> Void in
                     
-                    lock.lock()
                     completedCount += 1
                     
                     let progressTuple = BulkProgress(completedCount: completedCount, totalCount: totalCount)
@@ -704,19 +747,16 @@ extension Task
                         
                         fulfill(values)
                     }
-                    lock.unlock()
                     
                 }.failure { (errorInfo: ErrorInfo) -> Void in
 
                     let changed = cancelled.updateIf { $0 == false ? true : nil }
                     if changed != nil {
-                        lock.lock()
                         _reject(errorInfo)
 
                         for task in tasks {
                             task.cancel()
                         }
-                        lock.unlock()
                     }
                 }
             }
@@ -724,7 +764,7 @@ extension Task
             configure.pause = { self.pauseAll(tasks); return }
             configure.resume = { self.resumeAll(tasks); return }
             configure.cancel = {
-                if !cancelled.rawValue {
+                if !cancelled {
                     self.cancelAll(tasks);
                 }
             }
@@ -741,12 +781,10 @@ extension Task
             var completedCount = 0
             var rejectedCount = 0
             let totalCount = tasks.count
-            let lock = _RecursiveLock()
             
             for task in tasks {
                 task.success { (value: Value) -> Void in
                     
-                    lock.lock()
                     completedCount += 1
                     
                     if completedCount == 1 {
@@ -754,11 +792,9 @@ extension Task
                         
                         self.cancelAll(tasks)
                     }
-                    lock.unlock()
                     
                 }.failure { (errorInfo: ErrorInfo) -> Void in
                     
-                    lock.lock()
                     rejectedCount += 1
                     
                     if rejectedCount == totalCount {
@@ -767,7 +803,6 @@ extension Task
                         let errorInfo = ErrorInfo(error: nil, isCancelled: isAnyCancelled)  // NOTE: Task.any error returns nil (spec)
                         _reject(errorInfo)
                     }
-                    lock.unlock()
                 }
             }
             
@@ -790,12 +825,10 @@ extension Task
             
             var completedCount = 0
             let totalCount = tasks.count
-            let lock = _RecursiveLock()
             
             for task in tasks {
                 task.then { (value: Value?, errorInfo: ErrorInfo?) -> Void in
                     
-                    lock.lock()
                     completedCount += 1
                     
                     let progressTuple = BulkProgress(completedCount: completedCount, totalCount: totalCount)
@@ -812,7 +845,6 @@ extension Task
                         
                         fulfill(values)
                     }
-                    lock.unlock()
                     
                 }
             }
